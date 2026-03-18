@@ -63,39 +63,6 @@ Input Data
 
 ---
 
-## to Extend (When You’re Ready)
-
-Add more rules like:
-
-- **Type checks**: ensure `id` is an integer
-- **Cross-field checks**: if `status == "MISSING"`, then `name` must not be empty
-- **Row-level policy**: minimum number of rows, required combinations
-- **Schema check**: header must match expected set
-- **Threshold rule**: error if more than X% rows are invalid
-
-**Example: type check for integer `id`:**
-
-```python
-def field_is_int(field: str, severity: str = "ERROR") -> RuleFunc:
-    def _rule(row, idx):
-        val = (row.get(field) or "").strip()
-        if val == "":
-            return []
-        try:
-            int(val)
-            return []
-        except ValueError:
-            return [ValidationIssue(
-                row_index=idx,
-                field=field,
-                code="NOT_INTEGER",
-                severity=severity,
-                message=f"Field '{field}' must be an integer, got '{val}'."
-            )]
-    return _rule
-
----
-
 ## Usage
 
 1. Ensure you have Python 3.10+ installed.
