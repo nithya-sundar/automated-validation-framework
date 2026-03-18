@@ -60,3 +60,13 @@ Input Data
 - Validation‑first thinking
 - Structured problem solving
 - Clear technical documentation
+
+---
+
+## Usage
+
+1. Ensure you have Python 3.10+ installed.
+2. From the repository root, run:
+
+```bash
+python -m src.run_validation
