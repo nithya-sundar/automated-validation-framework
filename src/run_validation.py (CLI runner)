@@ -1,0 +1,62 @@
+"""
+CLI runner for the automated validation framework.
+Usage:
+    python -m src.run_validation
+"""
+from pathlib import Path
+from validator import (
+    load_csv,
+    Validator,
+    write_report,
+    require_fields,
+    field_in_set,
+    unique_field,
+    no_placeholder_text,
+)
+
+# If running as a module (recommended), the working directory should be the repo root.
+DATA_FILE = Path("data/sample_input.csv")
+REPORT_FILE = Path("reports/validation_report.txt")
+
+
+def build_rules():
+    """
+    Define the rules you want to apply.
+    You can tweak these without touching the core engine.
+    """
+    rules = [
+        # 1) Require these fields
+        require_fields(["id", "name", "status"]),
+
+        # 2) Allowed status values (make errors on invalid)
+        field_in_set("status", allowed=["OK", "MISSING", "INVALID"], severity="ERROR"),
+
+        # 3) ID must be unique
+        unique_field("id"),
+
+        # 4) Warn on placeholder-like values in free-text fields
+        no_placeholder_text(["name"], placeholders=["TBD", "N/A", "-", "NA"], severity="WARN"),
+    ]
+    return rules
+
+
+def main():
+    # Load input
+    rows = load_csv(DATA_FILE)
+
+    # Build rules and validate
+    validator = Validator(rules=build_rules())
+    result = validator.validate_rows(rows)
+
+    # Write report
+    write_report(result, REPORT_FILE)
+
+    # Print console summary
+    print(f"Validated {result.total_rows} rows.")
+    print(f"Errors: {len(result.errors)} | Warnings: {len(result.warnings)}")
+    print(f"Overall: {'PASS' if result.passed else 'FAIL'}")
+    print(f"Report written to: {REPORT_FILE.resolve()}")
+
+
+if __name__ == "__main__":
+    main()
