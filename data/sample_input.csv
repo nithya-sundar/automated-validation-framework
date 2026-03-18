@@ -1,1 +1,4 @@
-
+id,name,status
+1,Item A,OK
+2,Item B,OK
+3,Item C,MISSING
